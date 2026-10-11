@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+ <meta charset="UTF-8">
+ <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>F.pad Output Shape Calculator for PyTorch | HeyTensor</title>
+ <meta name="description" content="Enter a tensor shape and an F.pad tuple. Get the PyTorch output shape for each dimension, with the limits of the reflect, replicate and circular modes.">
+ <meta name="robots" content="index, follow">
+ <link rel="canonical" href="https://heytensor.com/tools/pad-output-shape-calculator.html">
+ <link rel="alternate" hreflang="en" href="https://heytensor.com/tools/pad-output-shape-calculator.html">
+ <link rel="alternate" hreflang="x-default" href="https://heytensor.com/tools/pad-output-shape-calculator.html">
+ <meta property="og:type" content="website">
+ <meta property="og:title" content="F.pad Output Shape Calculator for PyTorch | HeyTensor">
+ <meta property="og:description" content="Enter a tensor shape and an F.pad tuple. Get the PyTorch output shape for each dimension, with the limits of the reflect, replicate and circular modes.">
+ <meta property="og:url" content="https://heytensor.com/tools/pad-output-shape-calculator.html">
+ <meta property="og:site_name" content="HeyTensor">
+ <meta name="twitter:card" content="summary_large_image">
+ <meta name="twitter:title" content="F.pad Output Shape Calculator for PyTorch | HeyTensor">
+ <meta name="twitter:description" content="Enter a tensor shape and an F.pad tuple. Get the PyTorch output shape for each dimension, with the limits of the reflect, replicate and circular modes.">
+ <link rel="preconnect" href="https://fonts.googleapis.com">
+ <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+ <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&amp;family=JetBrains+Mono:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="/assets/style.css">
+ <link rel="stylesheet" href="/assets/tools.css">
+ <script type="application/ld+json">
+ {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "F.pad Output Shape Calculator",
+  "url": "https://heytensor.com/tools/pad-output-shape-calculator.html",
+  "description": "Enter a tensor shape and an F.pad tuple. Get the PyTorch output shape for each dimension, with the limits of the reflect, replicate and circular modes.",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Any",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "browserRequirements": "Requires JavaScript",
+  "author": { "@type": "Person", "name": "Michael Lip", "url": "https://zovo.one" },
+  "datePublished": "2026-10-11",
+  "dateModified": "2026-10-11"
+ }
+ </script>
+ <script type="application/ld+json">
+ {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://heytensor.com/"},{"@type":"ListItem","position":2,"name":"Tools","item":"https://heytensor.com/tools/"},{"@type":"ListItem","position":3,"name":"F.pad Output Shape Calculator","item":"https://heytensor.com/tools/pad-output-shape-calculator.html"}]}
+ </script>
+ <style>
+  :root {
+   --pad-panel: #111720;
+   --pad-border: #273142;
+   --pad-accent: #8be9fd;
+   --pad-violet: #bd93f9;
+   --pad-green: #50fa7b;
+   --pad-danger: #ff7b86;
+   --pad-soft: #b6c2d2;
+  }
+  main > .breadcrumb { display: block; position: static; background: transparent; border: 0; font-size: .875rem; }
+  .hero-byline { font-size: .875rem; color: var(--pad-soft); }
+  .pad-shell { max-width: 960px; margin: 0 auto 3rem; }
+  .pad-panel { background: var(--pad-panel); border: 1px solid var(--pad-border); border-radius: 16px; padding: clamp(1rem, 3vw, 2rem); }
+  .pad-heading { display: flex; align-items: end; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; }
+  .pad-heading h2 { margin: 0; }
+  .pad-privacy { color: var(--pad-soft); font-size: .875rem; }
+  .pad-grid { display: grid; grid-template-columns: 2fr 2fr 1fr; gap: 1rem; }
+  .field { display: flex; flex-direction: column; gap: .4rem; min-width: 0; }
+  .field label { font-weight: 600; font-size: .95rem; color: var(--pad-soft); }
+  .field input, .field select { width: 100%; box-sizing: border-box; border: 1px solid #344054; border-radius: 8px; padding: .72rem .78rem; background: #0b1017; color: var(--text); font: 500 1rem 'JetBrains Mono', monospace; }
+  .field input:focus, .field select:focus, main a:focus-visible { outline: 2px solid var(--pad-accent); outline-offset: 2px; }
+  .field-note { color: var(--pad-soft); font-size: .875rem; line-height: 1.4; }
+  .pad-result { margin-top: 1.25rem; }
+  .pad-status { margin: 0; padding: .85rem 1rem; border: 1px solid rgba(255,123,134,.55); border-radius: 8px; background: rgba(255,123,134,.08); color: #ffd7da; line-height: 1.55; overflow-wrap: anywhere; }
+  .pad-status[hidden], .pad-ok[hidden] { display: none; }
+  .pad-ok { border-left: 3px solid var(--pad-green); background: rgba(80,250,123,.05); border-radius: 0 10px 10px 0; padding: 1rem; }
+  .pad-label { margin: 0; color: var(--pad-soft); font-size: .875rem; }
+  .ht-big { display: block; margin: .2rem 0 .6rem; font: 700 clamp(1.3rem, 5vw, 1.9rem) 'JetBrains Mono', monospace; color: var(--pad-green); overflow-wrap: anywhere; }
+  .pad-call { margin: 0 0 .6rem; font: 500 .9rem/1.6 'JetBrains Mono', monospace; color: #dce8f5; overflow-wrap: anywhere; }
+  .pad-note { margin: 0 0 .8rem; color: #ffe9b5; font-size: .9rem; line-height: 1.55; }
+  .pad-note[hidden] { display: none; }
+  .table-wrap { overflow-x: auto; }
+  .pad-table { display: table; width: 100%; border-collapse: collapse; font-size: .875rem; }
+  .pad-table .layer-name { white-space: nowrap; overflow-wrap: normal; }
+  .pad-table th, .pad-table td { padding: .6rem .55rem; border-bottom: 1px solid var(--pad-border); vertical-align: top; text-align: left; }
+  .pad-table th { color: var(--pad-soft); font-size: .875rem; font-weight: 600; }
+  .pad-table code, .pad-table .mono { font-family: 'JetBrains Mono', monospace; font-size: .875rem; }
+  .mono { font-family: 'JetBrains Mono', monospace; }
+  main code { font-size: .875rem; }
+  .content-section { max-width: 860px; margin: 2.5rem auto; line-height: 1.75; }
+  .content-section h2 { margin-top: 2.4rem; }
+  .content-section p { margin: .9rem 0; }
+  .content-section code { overflow-wrap: anywhere; }
+  .content-section .pad-table { margin: 1rem 0; border: 1px solid var(--pad-border); background: var(--pad-panel); }
+  .formula-block { overflow-x: auto; margin: .9rem 0; padding: 1rem; border: 1px solid var(--pad-border); border-radius: 10px; background: #0c121a; color: #dce8f5; font: .9rem/1.8 'JetBrains Mono', monospace; }
+  .error-list { list-style: none; margin: 1rem 0; padding: 0; }
+  .error-list li { margin: 0 0 .9rem; padding: .9rem 1rem; border: 1px solid var(--pad-border); border-radius: 10px; background: #0c121a; }
+  .error-list p { margin: 0 0 .4rem; }
+  .error-list li > code { display: block; margin: .3rem 0 .6rem; line-height: 1.55; color: #dce8f5; overflow-wrap: anywhere; white-space: normal; }
+  .error-version { color: var(--pad-soft); font-size: .875rem; }
+  .fixture-section { max-width: 960px; margin: 2.75rem auto; }
+  .fixture-summary { color: var(--pad-soft); }
+  .fixture-pass { color: var(--pad-green); font-weight: 700; }
+  .fixture-fail { color: var(--pad-danger); font-weight: 700; }
+  .fixture-section .pad-table { border: 1px solid var(--pad-border); background: var(--pad-panel); }
+  .sources-list { padding-left: 1.4rem; }
+  .sources-list li { margin-bottom: .8rem; }
+  .related-card p { font-size: .875rem; }
+  .author-box { display: grid; grid-template-columns: auto 1fr; gap: 1rem; align-items: center; margin: 2.5rem auto; max-width: 860px; border: 1px solid var(--pad-border); border-radius: 12px; padding: 1.25rem; background: rgba(17,23,32,.7); }
+  .author-mark { display: grid; place-items: center; width: 3rem; height: 3rem; border-radius: 50%; background: linear-gradient(135deg,var(--pad-accent),var(--pad-violet)); color: #081018; font-weight: 800; }
+  .author-box h2 { margin: 0 0 .25rem; font-size: 1rem; }
+  .author-box p { margin: 0; color: var(--pad-soft); line-height: 1.55; }
+  .last-updated { font-size: .875rem; }
+  /* The shared call-to-action sheet sets this line to 11.5 px. This page needs 12 px or more on a phone. */
+  main .product-cta .product-cta-kicker { font-size: .75rem !important; }
+  /* The shared footer line is 11.2 px. */
+  .site-footer .footer-copy { font-size: .75rem; }
+  @media (max-width: 720px) {
+   .pad-grid { grid-template-columns: 1fr; }
+   .pad-heading { display: block; }
+   .pad-privacy { display: block; margin-top: .4rem; }
+   .pad-panel { padding: 1rem; border-radius: 12px; }
+   .pad-table th, .pad-table td { padding: .55rem .4rem; }
+   .author-box { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 400px) {
+   .pad-panel, .pad-ok { padding: .75rem; }
+   .pad-result .pad-table th, .pad-result .pad-table td { padding: .5rem .25rem; }
+  }
+ </style>
+<link rel="stylesheet" href="/assets/css/product-cta.css">
+<script defer src="/assets/js/product-navigation.js"></script>
+<script defer src="/assets/js/roi-measurement.js"></script>
+</head>
+<body>
+ <header>
+  <div class="container header-inner">
+   <a href="/" class="logo">Hey<span>Tensor</span></a>
+   <button class="mobile-toggle" aria-label="Menu" aria-expanded="false">&#9776;</button>
+   <nav>
+ <a class="nav-toolkit" href="https://buy.heytensor.com/">Debug Toolkit <span>· $29</span></a>
+    <a href="/">Calculator</a>
+    <a href="/tools/" class="active">Tools</a>
+    <a href="/answers/">Answers</a>
+    <a href="/research/">Research</a>
+    <a href="/guides/">Guides</a>
+    <a href="/about.html">About</a>
+    <a href="/blog/">Blog</a>
+    <div class="nav-right">
+     <a href="https://zovo.one/pricing?utm_source=heytensor&amp;utm_medium=satellite&amp;utm_campaign=nav-link" class="nav-pro" target="_blank" rel="noopener">Go Pro &#10022;</a>
+     <a href="https://zovo.one/tools?utm_source=heytensor&amp;utm_medium=nav&amp;utm_campaign=tools-pad-output-shape-calculator" class="nav-zovo">Zovo Tools</a>
+    </div>
+   </nav>
+  </div>
+ </header>
+
+ <main class="container">
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+   <a href="/">Home</a> <span>/</span> <a href="/tools/">Tools</a> <span>/</span> <span>F.pad Output Shape Calculator</span>
+  </nav>
+
+  <section class="hero tool-hero">
+   <h1>F.pad Output Shape Calculator</h1>
+   <p class="qas" data-keyword="pytorch F.pad output shape">Enter the input shape and the pad tuple of <code>torch.nn.functional.pad</code>. The calculator gives the output shape and shows which dimension each pair of values changes. The first pair changes the last dimension.</p>
+   <p class="hero-byline">Built by <a href="/about.html">Michael Lip</a> · calculator runs entirely in your browser</p>
+  </section>
+
+  <div class="pad-shell">
+   <section class="pad-panel" aria-labelledby="calculator-title">
+    <div class="pad-heading">
+     <h2 id="calculator-title">Input shape and pad tuple</h2>
+     <span class="pad-privacy">No inputs leave this page.</span>
+    </div>
+    <div class="pad-grid">
+     <div class="field">
+      <label for="ht-shape">Input shape</label>
+      <input id="ht-shape" name="shape" type="text" value="3, 3, 4, 2" maxlength="200" spellcheck="false" autocapitalize="off" aria-describedby="ht-shape-note">
+      <span class="field-note" id="ht-shape-note">Whole numbers of 1 or more, with a comma between them. Example: 1, 3, 224, 224</span>
+     </div>
+     <div class="field">
+      <label for="ht-pad">Pad tuple</label>
+      <input id="ht-pad" name="pad" type="text" value="1, 1, 2, 2" maxlength="200" spellcheck="false" autocapitalize="off" aria-describedby="ht-pad-note">
+      <span class="field-note" id="ht-pad-note">Two whole numbers for each padded dimension. The first pair is for the last dimension.</span>
+     </div>
+     <div class="field">
+      <label for="ht-mode">Mode</label>
+      <select id="ht-mode" name="mode">
+       <option value="constant" selected>constant</option>
+       <option value="reflect">reflect</option>
+       <option value="replicate">replicate</option>
+       <option value="circular">circular</option>
+      </select>
+     </div>
+    </div>
+
+    <div id="ht-out" class="pad-result" aria-live="polite">
+     <p id="ht-status" class="pad-status" hidden></p>
+     <div id="ht-ok" class="pad-ok" hidden>
+      <p class="pad-label">Output shape</p>
+      <output id="ht-shape-out" class="ht-big" for="ht-shape ht-pad ht-mode"></output>
+      <p id="ht-call" class="pad-call"></p>
+      <p id="ht-note" class="pad-note" hidden></p>
+      <div class="table-wrap">
+       <table class="pad-table">
+        <thead><tr><th scope="col">Pair</th><th scope="col">Dimension</th><th scope="col">Size in</th><th scope="col">Pad</th><th scope="col">Size out</th></tr></thead>
+        <tbody id="ht-rows"></tbody>
+       </table>
+      </div>
+     </div>
+    </div>
+    <noscript><p class="pad-status">JavaScript is required to calculate the output shape.</p></noscript>
+   </section>
+  </div>
+
+  <section class="content-section">
+   <h2>How F.pad reads the pad tuple</h2>
+   <p>The PyTorch 2.14 documentation of <code>torch.nn.functional.pad</code> says that the padding sizes are described "starting from the last dimension". The first two values of the tuple change the last dimension. The next two values change the dimension before it, and the order continues toward the first dimension. A dimension that has no pair keeps its size.</p>
+   <p>The documentation names the values. For the last dimension the tuple is <code>(padding_left, padding_right)</code>. For the last 2 dimensions it is <code>(padding_left, padding_right, padding_top, padding_bottom)</code>. For the last 3 dimensions, <code>padding_front</code> and <code>padding_back</code> follow these four values. The tuple must have an even number of values, and it cannot have more pairs than the input has dimensions.</p>
+   <p>The documentation page shows three examples on an input of shape <code>(3, 3, 4, 2)</code>.</p>
+   <div class="table-wrap">
+    <table class="pad-table">
+     <thead><tr><th scope="col">Pad tuple</th><th scope="col">Comment in the docs</th><th scope="col">Size printed in the docs</th></tr></thead>
+     <tbody>
+      <tr><td><code>(1, 1)</code></td><td>pad last dim by 1 on each side</td><td><code>torch.Size([3, 3, 4, 4])</code></td></tr>
+      <tr><td><code>(1, 1, 2, 2)</code></td><td>pad last dim by (1, 1) and 2nd to last by (2, 2)</td><td><code>torch.Size([3, 3, 8, 4])</code></td></tr>
+      <tr><td><code>(0, 1, 2, 1, 3, 3)</code></td><td>pad by (0, 1), (2, 1), and (3, 3)</td><td><code>torch.Size([3, 9, 7, 3])</code></td></tr>
+     </tbody>
+    </table>
+   </div>
+   <p>In the third example the input has 4 dimensions and the tuple has 3 pairs. The third pair changes dimension 1, from 3 to 9. A third pair on a 4D input does not change dimension 0.</p>
+   <p>The default mode is <code>'constant'</code>. For the fill value the documentation says "Default: 0", and the signature on the same page shows <code>value=None</code>. The calculator has no value field, because the fill value does not change a size in constant mode.</p>
+
+   <h2>The output size rule and the padding layers</h2>
+   <p>The <code>F.pad</code> page prints no size formula. The pages of the padding layers print it. For the 2D layers the formulas are:</p>
+   <div class="formula-block" aria-label="Output size formulas of the 2D padding layers">
+H_out = H_in + padding_top + padding_bottom<br>
+W_out = W_in + padding_left + padding_right
+   </div>
+   <p>The calculator uses the same sum for each dimension that has a pair: size out = size in + first value + second value. The five 2D layers below call <code>F.pad</code> with one mode each, as the PyTorch source at tag v2.14.0 shows. Each layer page says "For N-dimensional padding, use torch.nn.functional.pad()."</p>
+   <div class="table-wrap">
+    <table class="pad-table">
+     <thead><tr><th scope="col">Layer and its mode in F.pad</th><th scope="col">Size limit on the layer page</th></tr></thead>
+     <tbody>
+      <tr><td><code class="layer-name">nn.ZeroPad2d</code><br>constant, fill value 0</td><td>None stated</td></tr>
+      <tr><td><code class="layer-name">nn.ConstantPad2d</code><br>constant, fill value from the layer</td><td>None stated</td></tr>
+      <tr><td><code class="layer-name">nn.ReflectionPad2d</code><br>reflect</td><td>"padding size should be less than the corresponding input dimension"</td></tr>
+      <tr><td><code class="layer-name">nn.ReplicationPad2d</code><br>replicate</td><td>"the output dimensions must remain positive"</td></tr>
+      <tr><td><code class="layer-name">nn.CircularPad2d</code><br>circular</td><td>"padding size should be less than or equal to the corresponding input dimension"</td></tr>
+     </tbody>
+    </table>
+   </div>
+   <p>Each 2D layer takes a 4-tuple in the order <code>(padding_left, padding_right, padding_top, padding_bottom)</code>. The <code>F.pad</code> tuple has the same order. An <code>int</code> gives the same padding on all four sides. The documentation example <code>nn.ReflectionPad2d(2)</code> on an input of shape <code>(1, 1, 3, 3)</code> prints a 7 x 7 result. In the calculator, enter <code>1, 1, 3, 3</code>, the tuple <code>2, 2, 2, 2</code> and the mode reflect to get <code>(1, 1, 7, 7)</code>.</p>
+
+   <h2>Which mode works on which input</h2>
+   <p>The documentation says "Constant padding is implemented for arbitrary dimensions." For the other three modes it lists the permitted inputs: "Circular, replicate and reflection padding are implemented for padding the last 3 dimensions of a 4D or 5D input tensor, the last 2 dimensions of a 3D or 4D input tensor, or the last dimension of a 2D or 3D input tensor."</p>
+   <div class="table-wrap">
+    <table class="pad-table">
+     <thead><tr><th scope="col">Pairs in the tuple</th><th scope="col">Padded dimensions</th><th scope="col">Input for reflect, replicate and circular</th></tr></thead>
+     <tbody>
+      <tr><td>1 pair (2 values)</td><td>The last dimension</td><td>2D or 3D</td></tr>
+      <tr><td>2 pairs (4 values)</td><td>The last 2 dimensions</td><td>3D or 4D</td></tr>
+      <tr><td>3 pairs (6 values)</td><td>The last 3 dimensions</td><td>4D or 5D</td></tr>
+     </tbody>
+    </table>
+   </div>
+   <p>A 4D input with one pair and the mode reflect is not in this list. The calculator shows a message and no shape for such a combination. Constant mode takes one pair on a 4D input: the first example of the documentation does this.</p>
+   <p>The size limits are different for each mode. In reflect mode a pad value must be less than the input size of its dimension. In circular mode a pad value can be equal to the input size. The replication pages state no upper limit. On an input of shape <code>(1, 1, 3, 3)</code>, the tuple <code>(3, 3, 3, 3)</code> is an error in reflect mode and gives <code>(1, 1, 9, 9)</code> in circular mode, and the tuple <code>(4, 4, 4, 4)</code> is an error in the two modes. In replicate mode, an input of shape <code>(1, 2, 4)</code> with the tuple <code>(10, 10)</code> gives <code>(1, 2, 24)</code>. These results are from runs on torch 2.8.0 and torch 2.14.1.</p>
+
+   <h2>Negative pad values</h2>
+   <p>The <code>F.pad</code> page does not mention negative values. The pages of the circular layers do: "If negative padding is applied then the ends of the tensor get removed." The pages of the reflection, replication, constant and zero layers do not mention negative values.</p>
+   <p>In runs on torch 2.8.0 and torch 2.14.1, a negative value removed elements in all four modes. An input of shape <code>(1, 3, 8, 8)</code> with the tuple <code>(-1, -1)</code> gave <code>(1, 3, 8, 6)</code> in constant mode. An input of shape <code>(1, 2, 4)</code> with the tuple <code>(-1, -1)</code> gave <code>(1, 2, 2)</code> in reflect, replicate and circular mode. The calculator applies the same sum to a negative value and adds a note to the result.</p>
+   <p>A size of 0 depends on the mode and on the version. In constant mode, <code>(1, 3, 8, 8)</code> with <code>(-8, 0, 1, 1)</code> was a <code>RuntimeError</code> on torch 2.8.0 and gave <code>(1, 3, 10, 0)</code> on torch 2.14.1. In replicate mode, <code>(1, 1, 4, 4)</code> with <code>(-2, -2, 0, 0)</code> gave <code>(1, 1, 4, 0)</code> on torch 2.8.0 and was a <code>RuntimeError</code> on torch 2.14.1. For this reason the calculator gives no shape when a size is 0. A size below 0 was an error in each run. The calculator also takes no input shape that has a size of 0. In runs on torch 2.8.0 and torch 2.14.1, <code>F.pad</code> gave a shape for some such inputs and an error for other such inputs: <code>(0, 3)</code> with <code>(1, 1)</code> gave <code>(0, 5)</code> in constant mode, and <code>(1, 0, 3)</code> with <code>(1, 1)</code> was a <code>RuntimeError</code> in reflect mode.</p>
+   <p>The sum does not hold for each pair that has a negative value and a positive value. In constant mode, a negative value that removes more elements than the dimension has was a <code>RuntimeError</code> on torch 2.8.0 and torch 2.14.1: <code>(1, 3, 8, 8)</code> with <code>(-9, 10)</code> gave no result, and <code>(-8, 9)</code> gave <code>(1, 3, 8, 9)</code>. In circular mode, the result depended on the input when the positive value was larger than the size that stays after the removal: <code>(-3, 4)</code> gave <code>(1, 2, 5)</code> on an input of shape <code>(1, 2, 4)</code> and was a <code>RuntimeError</code> on an input of shape <code>(1, 1, 4)</code>. The calculator gives no shape for these pairs. In reflect and replicate mode, runs with such pairs gave the sum, for example <code>(1, 2, 4)</code> with <code>(-5, 3)</code> in reflect mode gave <code>(1, 2, 2)</code>. Each result in this paragraph was the same on torch 2.8.0 and torch 2.14.1.</p>
+
+   <h2>Error messages by torch version</h2>
+   <p>The documentation pages print no error message. The messages below are from runs on torch 2.8.0 and torch 2.14.1 (CPU builds, macOS on arm64, 2026-10-11). A different version can print a different text.</p>
+   <ul class="error-list">
+    <li><p>An odd number of values: shape <code>(3, 3, 4, 2)</code>, tuple <code>(1, 1, 1)</code>.</p><span class="error-version">torch 2.8.0 and torch 2.14.1</span><code>RuntimeError: Padding length must be divisible by 2</code></li>
+    <li><p>More pairs than dimensions: shape <code>(3, 3, 4, 2)</code>, a tuple of 10 values.</p><span class="error-version">torch 2.8.0 and torch 2.14.1</span><code>RuntimeError: Padding length should be less than or equal to two times the input dimension but got padding length 10 and input of dimension 4</code></li>
+    <li><p>Reflect mode on a 4D input with one pair: shape <code>(3, 3, 4, 2)</code>, tuple <code>(1, 1)</code>.</p><span class="error-version">torch 2.8.0</span><code>NotImplementedError: Only 2D, 3D, 4D, 5D padding with non-constant padding are supported for now</code><span class="error-version">torch 2.14.1, first line of the message</span><code>NotImplementedError: Padding size 2 is not supported for 4D input tensor.</code></li>
+    <li><p>Reflect mode with a pad value equal to the size: shape <code>(1, 1, 3, 3)</code>, tuple <code>(3, 3, 3, 3)</code>.</p><span class="error-version">torch 2.8.0 and torch 2.14.1</span><code>RuntimeError: Argument #4: Padding size should be less than the corresponding input dimension, but got: padding (3, 3) at dimension 3 of input [1, 1, 3, 3]</code></li>
+    <li><p>Circular mode with a pad value larger than the size: shape <code>(1, 1, 3, 3)</code>, tuple <code>(4, 4, 4, 4)</code>.</p><span class="error-version">torch 2.8.0 and torch 2.14.1</span><code>RuntimeError: Padding value causes wrapping around more than once.</code></li>
+   </ul>
+
+   <h2>Methodology and primary sources</h2>
+   <p>The rules on this page are from the PyTorch 2.14 documentation pages below, read on 2026-10-11. On that date the stable documentation address pointed to version 2.14. The calculator is JavaScript arithmetic in this page and does not run PyTorch. It does not check that a tensor of the given size fits in memory. The run results are from torch 2.8.0 and torch 2.14.1, CPU builds on macOS (arm64), on 2026-10-11. CUDA, MPS and other torch versions were not run.</p>
+   <ol class="sources-list">
+    <li><a href="https://docs.pytorch.org/docs/2.14/generated/torch.nn.functional.pad.html">PyTorch 2.14 docs, torch.nn.functional.pad</a>, tuple order, value names, the three examples, the mode list and the defaults.</li>
+    <li><a href="https://docs.pytorch.org/docs/2.14/generated/torch.nn.ReflectionPad2d.html">PyTorch 2.14 docs, ReflectionPad2d</a>, size formulas, the reflect limit and the 7 x 7 example.</li>
+    <li><a href="https://docs.pytorch.org/docs/2.14/generated/torch.nn.ReplicationPad2d.html">PyTorch 2.14 docs, ReplicationPad2d</a>, the sentence on positive output dimensions.</li>
+    <li><a href="https://docs.pytorch.org/docs/2.14/generated/torch.nn.CircularPad2d.html">PyTorch 2.14 docs, CircularPad2d</a>, the circular limit and the sentence on negative padding.</li>
+    <li><a href="https://docs.pytorch.org/docs/2.14/generated/torch.nn.ConstantPad2d.html">PyTorch 2.14 docs, ConstantPad2d</a>, size formulas for a constant fill value.</li>
+    <li><a href="https://docs.pytorch.org/docs/2.14/generated/torch.nn.ZeroPad2d.html">PyTorch 2.14 docs, ZeroPad2d</a>, size formulas for zero padding.</li>
+    <li><a href="https://github.com/pytorch/pytorch/blob/v2.14.0/torch/nn/modules/padding.py">PyTorch source at tag v2.14.0, torch/nn/modules/padding.py</a>, the <code>F.pad</code> call and the mode of each layer.</li>
+   </ol>
+  </section>
+
+  <section class="fixture-section" aria-labelledby="fixtures-title">
+   <h2 id="fixtures-title">Executable browser fixtures</h2>
+   <p class="fixture-summary" id="fixture-summary" role="status" aria-live="polite">The fixtures run in this browser when JavaScript is on.</p>
+   <div class="table-wrap">
+    <table class="pad-table">
+     <thead><tr><th scope="col">Fixture</th><th scope="col">Expected</th><th scope="col">Observed</th><th scope="col">Status</th></tr></thead>
+     <tbody id="fixture-results"></tbody>
+    </table>
+   </div>
+   <p class="field-note">Fixtures 1, 2, 3 and 5 are examples in the PyTorch 2.14 docs. The other expected values are from runs on torch 2.8.0 and torch 2.14.1.</p>
+  </section>
+
+  <section class="related-tools">
+   <h2>Related Tools</h2>
+   <div class="related-grid">
+    <a href="/tools/conv2d-calculator.html" class="related-card"><h3>Conv2d Output Size Calculator</h3><p>Calculate output height, width, and channels for PyTorch Conv2d layers.</p></a>
+    <a href="/tools/convtranspose2d-calculator.html" class="related-card"><h3>ConvTranspose2d Output Size Calculator</h3><p>Calculate output dimensions for transposed convolutions (upsampling).</p></a>
+    <a href="/tools/maxpool2d-calculator.html" class="related-card"><h3>MaxPool2d Output Size Calculator</h3><p>Calculate pooling output dimensions with kernel, stride, and padding.</p></a>
+    <a href="/tools/reshape-calculator.html" class="related-card"><h3>Reshape / View Calculator</h3><p>Validate reshape operations and infer missing dimensions with -1.</p></a>
+    <a href="/tools/shape-mismatch.html" class="related-card"><h3>PyTorch Shape Mismatch Error Debugger</h3><p>Paste any shape error and get a plain English explanation with fix.</p></a>
+   </div>
+  </section>
+
+  <aside class="author-box" aria-labelledby="author-title">
+   <div class="author-mark" aria-hidden="true">ML</div>
+   <div><h2 id="author-title">Built and reviewed by Michael Lip</h2><p>Michael builds HeyTensor’s browser-based PyTorch and deep-learning utilities. This page uses deterministic local arithmetic and cites primary framework documentation so each result can be audited.</p></div>
+  </aside>
+
+  <div class="last-updated"><time datetime="2026-10-11">Last updated: October 11, 2026</time></div>
+
+<section class="product-cta" aria-labelledby="product-cta-title">
+ <div class="product-cta-copy"><p class="product-cta-kicker">TENSOR PREFLIGHT · DOWNLOADABLE PYTORCH TOOLKIT</p>
+ <h2 id="product-cta-title">Take the next step in your own PyTorch model.</h2>
+ <p>Trace a local forward pass, inspect tensor shapes in an HTML report, and turn a repair into a regression check. Includes eight broken-and-fixed workflows, source code and setup instructions.</p>
+ <details class="product-fit"><summary>Is this toolkit right for my problem?</summary><p><strong>Use the free calculator</strong> for a layer formula or a quick shape check.</p><p><strong>Consider Tensor Preflight</strong> when you have a local PyTorch model and want a forward-pass report plus repeatable checks. Python 3.9+ and PyTorch 2.8+ are required. It does not run your model in this website or automatically repair it.</p><p>Open the sample report before buying to check the output format.</p></details>
+ <p class="product-cta-requirements">Python 3.9+ · PyTorch 2.8+ · Runs locally</p></div>
+ <div class="product-cta-actions"><a class="product-cta-buy" href="https://buy.heytensor.com/?utm_source=heytensor&utm_medium=website&utm_campaign=toolkit-fit&utm_content=tools%2Fpad-output-shape-calculator">Get Tensor Preflight — $29 <span aria-hidden="true">→</span></a>
+ <span class="product-cta-payment">One-time payment · ZIP download</span>
+ <a class="product-cta-sample" href="https://buy.heytensor.com/sample-report.html?utm_source=heytensor&utm_medium=website&utm_campaign=toolkit-fit&utm_content=tools%2Fpad-output-shape-calculator">See a sample report</a></div>
+</section>
+
+</main>
+
+ <footer class="site-footer">
+  <div class="footer-inner">
+   <div class="footer-brand">Zovo Tools</div>
+   <div class="footer-tagline">Free developer tools by a solo dev. Optional analytics by consent.</div>
+   <a href="https://zovo.one/pricing?utm_source=heytensor&amp;utm_medium=satellite&amp;utm_campaign=footer-link" class="footer-cta">Zovo Lifetime, $99 once, free forever →</a>
+   <div class="footer-copy">© 2026 <a href="https://zovo.one/lifetime?utm_source=heytensor&amp;utm_medium=footer&amp;utm_campaign=tools-pad-output-shape-calculator">Zovo</a> · lifetime access, one payment</div>
+  </div>
+ </footer>
+
+ <script src="/assets/js/app.js"></script>
+ <script>
+ (function () {
+  'use strict';
+
+  var MODES = ['constant', 'reflect', 'replicate', 'circular'];
+  var MAX_VALUES = 32;
+  var TOKEN = /^(0|-?[1-9][0-9]{0,14})$/;
+  var PAIR_NAMES = ['left, right', 'top, bottom', 'front, back'];
+
+  var shapeField = document.getElementById('ht-shape');
+  var padField = document.getElementById('ht-pad');
+  var modeField = document.getElementById('ht-mode');
+  var statusBox = document.getElementById('ht-status');
+  var okBox = document.getElementById('ht-ok');
+  var shapeOut = document.getElementById('ht-shape-out');
+  var callLine = document.getElementById('ht-call');
+  var noteLine = document.getElementById('ht-note');
+  var rowsBody = document.getElementById('ht-rows');
+
+  function fail(message) {
+   return { ok: false, message: message };
+  }
+
+  function tupleText(values) {
+   if (values.length === 1) return '(' + values[0] + ',)';
+   return '(' + values.join(', ') + ')';
+  }
+
+  function unwrap(text) {
+   var t = String(text).trim();
+   var m = /^torch\.Size\(\s*\[(.*)\]\s*\)$/.exec(t) || /^\((.*)\)$/.exec(t) || /^\[(.*)\]$/.exec(t);
+   if (m) t = m[1].trim();
+   if (t.charAt(t.length - 1) === ',') t = t.slice(0, -1).trim();
+   return t;
+  }
+
+  function parseList(text, label, example) {
+   var t = unwrap(text);
+   if (t === '') return fail('Enter the ' + label + '. Example: ' + example);
+   var parts = t.split(/\s*,\s*|\s+/);
+   if (parts.length > MAX_VALUES) return fail('The ' + label + ' has more than ' + MAX_VALUES + ' values. This calculator does not take it.');
+   var values = [];
+   for (var i = 0; i < parts.length; i += 1) {
+    var part = parts[i];
+    if (!TOKEN.test(part)) {
+     if (/^-?[0-9]{16,}$/.test(part)) return fail('A value in the ' + label + ' has more than 15 digits. This calculator does not take it.');
+     if (/^-0+$/.test(part)) return fail('A value in the ' + label + ' is a zero with a minus sign. Write 0 with no sign. Example: ' + example);
+     return fail('The ' + label + ' must be whole numbers in plain digits, with a comma between them. Example: ' + example + '. This part is not accepted: "' + part.slice(0, 24) + '". Do not write a decimal point, an exponent, a thousands separator or a leading zero.');
+    }
+    values.push(Number(part));
+   }
+   return { ok: true, values: values };
+  }
+
+  function modeSupports(mode, dims, pairs) {
+   if (mode === 'constant') return true;
+   return pairs >= 1 && pairs <= 3 && (dims === pairs + 1 || dims === pairs + 2);
+  }
+
+  function checkPair(mode, pairNumber, dim, size, before, after) {
+   var where = 'Pair ' + pairNumber + ' is (' + before + ', ' + after + ') and dimension ' + dim + ' has size ' + size + '.';
+   if (mode === 'reflect' && (before >= size || after >= size)) {
+    return 'Reflect mode needs each pad value to be less than the input size of its dimension. ' + where;
+   }
+   if (mode === 'circular' && (before > size || after > size)) {
+    return 'Circular mode needs each pad value to be less than or equal to the input size of its dimension. ' + where;
+   }
+   var out = size + before + after;
+   if (out < 0) return 'The pad values remove more elements than the dimension has. ' + where + ' F.pad cannot return a size below 0.';
+   if (out === 0) return 'The pad values make a size of 0. ' + where + ' The result for a size of 0 depends on the mode and on the torch version, so this page gives no shape.';
+   if (mode === 'constant' && (-before > size || -after > size)) {
+    return 'A negative pad value removes more elements than the dimension has. ' + where + ' In constant mode this was a RuntimeError in runs on torch 2.8.0 and torch 2.14.1, also when the other value of the pair adds elements. This page gives no shape.';
+   }
+   if (mode === 'circular' && ((before < 0 && after > size + before) || (after < 0 && before > size + after))) {
+    return 'In circular mode, this pair removes elements on one side and adds more elements on the other side than the dimension keeps. ' + where + ' In runs on torch 2.8.0 and torch 2.14.1 such a pair gave a RuntimeError for some inputs and a shape for other inputs. This page gives no shape.';
+   }
+   return '';
+  }
+
+  function compute(shapeText, padText, mode) {
+   var shape = parseList(shapeText, 'input shape', '3, 3, 4, 2');
+   if (!shape.ok) return shape;
+   for (var s = 0; s < shape.values.length; s += 1) {
+    if (shape.values[s] === 0) return fail('A size in the input shape is 0. This calculator takes sizes of 1 or more and gives no shape for an input that has a size of 0. Example: 3, 3, 4, 2');
+    if (shape.values[s] < 1) return fail('Each size in the input shape must be 1 or more. Example: 3, 3, 4, 2');
+   }
+   var pad = parseList(padText, 'pad tuple', '1, 1, 2, 2');
+   if (!pad.ok) return pad;
+   if (MODES.indexOf(mode) < 0) return fail('The mode must be constant, reflect, replicate or circular.');
+   var dims = shape.values.length;
+   var count = pad.values.length;
+   if (count % 2 !== 0) return fail('The pad tuple has ' + count + ' value' + (count === 1 ? '' : 's') + '. F.pad needs an even number of values: two for each padded dimension.');
+   var pairs = count / 2;
+   if (pairs > dims) return fail('The pad tuple has ' + count + ' values (' + pairs + ' pairs). A ' + dims + 'D input takes at most ' + dims + ' pair' + (dims === 1 ? '' : 's') + ' (' + (2 * dims) + ' values).');
+   if (!modeSupports(mode, dims, pairs)) {
+    var asConstant = compute(shapeText, padText, 'constant');
+    return fail('Mode ' + mode + ' does not take ' + pairs + ' pair' + (pairs === 1 ? '' : 's') + ' on a ' + dims + 'D input. The PyTorch 2.14 docs list reflect, replicate and circular for 1 pair on a 2D or 3D input, 2 pairs on a 3D or 4D input, and 3 pairs on a 4D or 5D input.' + (asConstant.ok ? ' Constant mode takes this tuple.' : ' In constant mode this page gives a different message for these pad values.'));
+   }
+   var out = shape.values.slice();
+   var rows = [];
+   var negative = false;
+   for (var i = 0; i < pairs; i += 1) {
+    var dim = dims - 1 - i;
+    var before = pad.values[2 * i];
+    var after = pad.values[2 * i + 1];
+    var problem = checkPair(mode, i + 1, dim, shape.values[dim], before, after);
+    if (problem) return fail(problem);
+    if (before < 0 || after < 0) negative = true;
+    out[dim] = shape.values[dim] + before + after;
+    rows.push({ pair: String(i + 1) + (i < 3 ? ' (' + PAIR_NAMES[i] + ')' : ''), dim: dim, neg: dim - dims, sizeIn: shape.values[dim], pad: before + ', ' + after, sizeOut: out[dim] });
+   }
+   for (var d = dims - 1 - pairs; d >= 0; d -= 1) {
+    rows.push({ pair: 'none', dim: d, neg: d - dims, sizeIn: shape.values[d], pad: 'none', sizeOut: shape.values[d] });
+   }
+   return { ok: true, shape: shape.values, pad: pad.values, mode: mode, out: out, rows: rows, negative: negative };
+  }
+
+  function appendCell(row, value) {
+   var cell = document.createElement('td');
+   cell.textContent = value;
+   row.appendChild(cell);
+   return cell;
+  }
+
+  function showFailure(message) {
+   okBox.hidden = true;
+   shapeOut.textContent = '';
+   callLine.textContent = '';
+   noteLine.textContent = '';
+   noteLine.hidden = true;
+   rowsBody.replaceChildren();
+   statusBox.textContent = message;
+   statusBox.hidden = false;
+  }
+
+  function showResult(result) {
+   statusBox.hidden = true;
+   statusBox.textContent = '';
+   shapeOut.textContent = tupleText(result.out);
+   callLine.textContent = 'F.pad(x, ' + tupleText(result.pad) + ', mode=\'' + result.mode + '\') on x of shape ' + tupleText(result.shape);
+   if (result.negative) {
+    noteLine.textContent = result.mode === 'circular'
+     ? 'The tuple has a negative value. The pages of the circular layers say that negative padding removes the ends of the tensor.'
+     : 'The tuple has a negative value. The F.pad page does not describe negative values. This shape uses the sum that torch 2.8.0 and torch 2.14.1 applied in test runs.';
+    noteLine.hidden = false;
+   } else {
+    noteLine.textContent = '';
+    noteLine.hidden = true;
+   }
+   rowsBody.replaceChildren();
+   result.rows.forEach(function (item) {
+    var row = document.createElement('tr');
+    appendCell(row, item.pair);
+    appendCell(row, item.dim + ' (' + item.neg + ')');
+    appendCell(row, String(item.sizeIn));
+    appendCell(row, item.pad);
+    appendCell(row, String(item.sizeOut));
+    rowsBody.appendChild(row);
+   });
+   okBox.hidden = false;
+  }
+
+  function update() {
+   var result = compute(shapeField.value, padField.value, modeField.value);
+   if (result.ok) showResult(result);
+   else showFailure(result.message);
+  }
+
+  function runFixtures() {
+   var fixtures = [
+    ['3, 3, 4, 2', '1, 1', 'constant', '(3, 3, 4, 4)'],
+    ['3, 3, 4, 2', '1, 1, 2, 2', 'constant', '(3, 3, 8, 4)'],
+    ['3, 3, 4, 2', '0, 1, 2, 1, 3, 3', 'constant', '(3, 9, 7, 3)'],
+    ['1, 3, 224, 224', '3, 3, 3, 3', 'constant', '(1, 3, 230, 230)'],
+    ['1, 1, 3, 3', '2, 2, 2, 2', 'reflect', '(1, 1, 7, 7)'],
+    ['1, 3, 8, 8', '-1, -1', 'constant', '(1, 3, 8, 6)'],
+    ['3, 3, 4, 2', '1, 1, 1', 'constant', 'error'],
+    ['3, 3, 4, 2', '1, 1, 1, 1, 1, 1, 1, 1, 1, 1', 'constant', 'error'],
+    ['1, 1, 3, 3', '3, 3, 3, 3', 'reflect', 'error'],
+    ['3, 3, 4, 2', '1, 1', 'reflect', 'error'],
+    ['1, 1, 3, 3', '3, 3, 3, 3', 'circular', '(1, 1, 9, 9)'],
+    ['1, 1, 3, 3', '4, 4, 4, 4', 'circular', 'error'],
+    ['1, 2, 4', '10, 10', 'replicate', '(1, 2, 24)'],
+    ['1, 2, 4', '-1, -1', 'circular', '(1, 2, 2)'],
+    ['1, 3, 8, 8', '-9, 10', 'constant', 'error'],
+    ['1, 3, 8, 8', '-8, 9', 'constant', '(1, 3, 8, 9)'],
+    ['1, 1, 4', '-3, 4', 'circular', 'error'],
+    ['1, 2, 4', '-5, 3', 'reflect', '(1, 2, 2)']
+   ];
+   var body = document.getElementById('fixture-results');
+   var passed = 0;
+   body.replaceChildren();
+   fixtures.forEach(function (fixture, index) {
+    var result = compute(fixture[0], fixture[1], fixture[2]);
+    var observed = result.ok ? tupleText(result.out) : 'error';
+    var pass = observed === fixture[3];
+    if (pass) passed += 1;
+    var row = document.createElement('tr');
+    appendCell(row, (index + 1) + '. (' + fixture[0] + ') with (' + fixture[1] + '), ' + fixture[2]);
+    appendCell(row, fixture[3] === 'error' ? 'A message and no shape' : fixture[3]);
+    appendCell(row, result.ok ? observed : 'A message and no shape');
+    appendCell(row, pass ? 'PASS' : 'FAIL').className = pass ? 'fixture-pass' : 'fixture-fail';
+    body.appendChild(row);
+   });
+   var summary = document.getElementById('fixture-summary');
+   summary.textContent = passed + ' of ' + fixtures.length + ' fixtures passed in this browser.';
+   summary.className = 'fixture-summary ' + (passed === fixtures.length ? 'fixture-pass' : 'fixture-fail');
+  }
+
+  shapeField.addEventListener('input', update);
+  padField.addEventListener('input', update);
+  modeField.addEventListener('input', update);
+  modeField.addEventListener('change', update);
+  window.addEventListener('pageshow', update);
+  window.heyTensorPad = { compute: compute };
+
+  update();
+  runFixtures();
+ }());
+ </script>
+</body>
+</html>
