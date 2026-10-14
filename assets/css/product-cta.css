@@ -14,6 +14,11 @@ header nav a.nav-toolkit:focus-visible,.product-cta a:focus-visible{outline:3px 
 .product-cta-payment{font-size:.78rem;color:#c6c6ce}
 .product-cta a.product-cta-sample{font-size:.85rem;color:#f5d789;text-underline-offset:4px;text-decoration:underline;padding:6px}
 .product-cta-home{margin-top:20px;margin-bottom:32px}
+.preflight-sample{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin:0 0 24px;padding:16px 20px;border:1px solid #765624;border-radius:12px;background:#211d17;color:#f5f5f6}
+.preflight-sample p{margin:0;flex:1 1 320px;line-height:1.5}
+.preflight-sample a{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:8px;background:#fbbf24;color:#18130a;font-weight:700;text-decoration:none}
+.preflight-sample a:hover{background:#fcd34d}
+.preflight-sample a:focus-visible{outline:3px solid #fbbf24;outline-offset:4px}
 /* Added navigation item needs the compact menu on tablet widths too. */
 @media(max-width:1200px){header .mobile-toggle{display:block}header nav{display:none;position:absolute;top:100%;left:0;right:0;background:var(--bg,#101012);border-bottom:1px solid var(--border,#333);flex-direction:column;align-items:flex-start;padding:16px 20px;gap:14px;max-height:calc(100dvh - 80px);overflow-y:auto}header nav.open{display:flex}header .nav-right{flex-direction:row;flex-wrap:wrap;margin-left:0;gap:12px}header nav>a{min-height:32px;display:inline-flex;align-items:center}}
 @media(max-width:760px){.product-cta{flex-direction:column;align-items:stretch;padding:22px;gap:22px;margin:28px 0}.product-cta-actions{align-items:stretch;text-align:center}.product-cta a.product-cta-buy{white-space:normal}}
