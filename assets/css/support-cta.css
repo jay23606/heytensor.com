@@ -1,0 +1,40 @@
+/* Support (tip) CTAs. Static blocks, no overlays, no timers. Uses the v3 tokens from style.css. */
+.support-cta{font-family:var(--font-body);color:var(--text)}
+.support-cta .sc-title{font-family:var(--font-display);font-weight:700;font-size:1rem;line-height:1.35;color:var(--text);margin:0 0 6px;padding:0;border:0}
+.support-cta .sc-body{font-size:.92rem;line-height:1.6;color:#c6c6ce;margin:0 0 14px;padding:0}
+.support-cta .sc-actions{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.support-cta a.sc-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:10px 16px;box-sizing:border-box;border-radius:var(--radius);font-family:var(--font-body);font-size:.9rem;font-weight:700;line-height:1.3;text-decoration:none;text-align:center}
+.support-cta a.sc-btn-primary{background:var(--accent);color:#18130a;border:1px solid var(--accent)}
+.support-cta a.sc-btn-primary:hover{background:#fcd34d;border-color:#fcd34d;color:#18130a;text-decoration:none}
+.support-cta a.sc-btn-secondary{background:transparent;color:var(--text);border:1px solid var(--border-hover)}
+.support-cta a.sc-btn-secondary:hover{border-color:var(--accent);color:var(--accent);text-decoration:none}
+.support-cta a.sc-btn:focus-visible,.support-cta a.sc-why:focus-visible{outline:3px solid #fbbf24;outline-offset:3px}
+.support-cta .sc-btn svg{width:16px;height:16px;flex-shrink:0}
+.support-cta .sc-note{font-size:.78rem;color:#a1a1aa;margin:10px 0 0;padding:0;line-height:1.5}
+
+/* CTA 1: thank-you card after the answer or tool */
+.support-cta-result{margin:28px 0;padding:18px 20px;background:var(--bg-card);border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:var(--radius-lg)}
+
+/* CTA 2: footer block, sits under the existing Zovo footer offer */
+.support-cta-footer{margin:2rem 0 0;padding:1.5rem 0 0;border-top:1px solid var(--border);text-align:left}
+.support-cta-footer .sc-head{display:flex;align-items:center;gap:12px;margin:0 0 8px}
+.support-cta-footer .sc-head .sc-title{margin:0}
+.support-cta .sc-face{width:44px;height:44px;border-radius:50%;object-fit:cover;flex-shrink:0;display:block;background:var(--bg-card)}
+.support-cta-footer .sc-actions{margin-top:2px}
+.support-cta a.sc-why{display:inline-flex;align-items:center;min-height:44px;padding:0 4px;color:var(--accent-link);font-size:.85rem;text-decoration:underline;text-underline-offset:3px}
+
+/* CTA 3: /support/ page */
+.support-page{max-width:640px;margin:0 auto;padding:40px 20px 24px}
+.support-page .sc-face{width:48px;height:48px}
+.support-page .sc-head{display:flex;align-items:center;gap:14px;margin:0 0 20px}
+.support-page h1{font-size:1.6rem;margin:0}
+.support-page h2{font-size:1.05rem;margin:28px 0 8px}
+.support-page p{font-size:.98rem;line-height:1.7;color:var(--text);margin:0 0 12px}
+.support-page .sc-actions{margin:6px 0 4px}
+.support-page .sc-sign{margin-top:24px}
+
+@media (max-width:480px){
+  .support-cta-result{padding:16px}
+  .support-cta .sc-actions{gap:8px}
+  .support-cta a.sc-btn{flex:1 1 140px}
+}
