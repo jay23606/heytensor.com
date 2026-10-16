@@ -36,5 +36,5 @@
 @media (max-width:480px){
   .support-cta-result{padding:16px}
   .support-cta .sc-actions{gap:8px}
-  .support-cta a.sc-btn{flex:1 1 140px}
+  .support-cta a.sc-btn{flex:1 1 100%;white-space:nowrap}
 }
