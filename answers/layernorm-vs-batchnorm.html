@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en" data-sct-site="heytensor.com">
+<head>
+ <meta charset="UTF-8">
+ <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>LayerNorm vs BatchNorm: What Is the Difference? | HeyTensor</title>
+ <meta name="description" content="LayerNorm normalizes each sample over the feature dimension. BatchNorm normalizes each channel over the batch. Parameter counts, train and eval differences, measured in PyTorch 2.8.">
+ <meta name="robots" content="index, follow">
+ <link rel="canonical" href="https://heytensor.com/answers/layernorm-vs-batchnorm.html">
+ <meta property="og:type" content="article">
+ <meta property="og:title" content="LayerNorm vs BatchNorm, measured differences">
+ <meta property="og:description" content="LayerNorm normalizes each sample over the feature dimension. BatchNorm normalizes each channel over the batch. Parameter counts, train and eval differences, measured in PyTorch 2.8.">
+ <meta property="og:url" content="https://heytensor.com/answers/layernorm-vs-batchnorm.html">
+ <meta property="og:site_name" content="HeyTensor">
+ <meta property="og:image" content="https://heytensor.com/assets/og-image.png">
+ <meta name="twitter:card" content="summary_large_image">
+ <meta name="twitter:title" content="LayerNorm vs BatchNorm, measured differences">
+ <meta name="twitter:description" content="LayerNorm normalizes each sample over the feature dimension. BatchNorm normalizes each channel over the batch. Parameter counts, train and eval differences, measured in PyTorch 2.8.">
+ <meta name="twitter:image" content="https://heytensor.com/assets/og-image.png">
+ <link rel="preconnect" href="https://fonts.googleapis.com">
+ <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+ <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="/assets/style.css">
+ <script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "Article",
+ "headline": "What Is the Difference Between LayerNorm and BatchNorm?",
+ "description": "LayerNorm normalizes each sample over the feature dimension. BatchNorm normalizes each channel over the batch. Parameter counts, train and eval differences, measured in PyTorch 2.8.",
+ "url": "https://heytensor.com/answers/layernorm-vs-batchnorm.html",
+ "mainEntityOfPage": "https://heytensor.com/answers/layernorm-vs-batchnorm.html",
+ "datePublished": "2026-10-28",
+ "dateModified": "2026-10-28",
+ "author": {
+  "@type": "Organization",
+  "name": "HeyTensor",
+  "url": "https://heytensor.com/"
+ },
+ "publisher": {
+  "@type": "Organization",
+  "name": "HeyTensor",
+  "url": "https://heytensor.com/"
+ },
+ "image": "https://heytensor.com/assets/og-image.png"
+}
+</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://heytensor.com/"}, {"@type": "ListItem", "position": 2, "name": "Answers", "item": "https://heytensor.com/answers/"}, {"@type": "ListItem", "position": 3, "name": "What Is the Difference Between LayerNorm and BatchNorm?"}]}</script>
+<link rel="stylesheet" href="/assets/css/product-cta.css">
+<script defer src="/assets/js/product-navigation.js"></script>
+<script defer src="/assets/js/roi-measurement.js"></script>
+<link rel="stylesheet" href="/assets/css/support-cta.css?v=3">
+<link rel="stylesheet" href="/assets/support-v3.css?v=4-github-20261017">
+<script src="/assets/support-v3.js?v=3"></script>
+</head>
+<body>
+ <header>
+ <div class="container header-inner">
+ <a href="/" class="logo">Hey<span>Tensor</span></a>
+ <button class="mobile-toggle" aria-label="Menu">&#9776;</button>
+ <nav>
+ <a class="nav-toolkit" href="https://buy.heytensor.com/">Debug Toolkit <span>· $29</span></a>
+ <a href="/">Calculator</a>
+ <a href="/tools/">Tools</a>
+ <a href="/answers/" class="active">Answers</a>
+ <a href="/research/">Research</a>
+ <a href="/guides/">Guides</a>
+ <a href="/about.html">About</a>
+ <a href="/blog/">Blog</a>
+ <div class="nav-right">
+ <a href="https://zovo.one/pricing?utm_source=heytensor&amp;utm_medium=satellite&amp;utm_campaign=nav-link" class="nav-pro" target="_blank">Go Pro &#10022;</a>
+ <a href="https://zovo.one/tools?utm_source=heytensor&amp;utm_medium=nav&amp;utm_campaign=answers-layernorm-vs-batchnorm" class="nav-zovo">Zovo Tools</a>
+ </div>
+ </nav>
+ </div>
+ </header>
+
+ <main class="container" style="max-width:720px;">
+ <nav class="breadcrumb" aria-label="Breadcrumb">
+ <a href="/">Home</a> <span>/</span> <a href="/answers/">Answers</a> <span>/</span> <span>What Is the Difference Between LayerNorm and BatchNorm?</span>
+ </nav>
+
+ <article>
+ <h1>What Is the Difference Between LayerNorm and BatchNorm?</h1>
+
+ <h2>The Short Answer</h2>
+ <p><code>nn.LayerNorm</code> normalizes one sample at a time, over the dimensions you name in <code>normalized_shape</code>. <code>nn.BatchNorm2d</code> normalizes each channel, using statistics from the whole batch. The choice changes which tensors share a statistic, how many parameters the layer holds, and what happens in evaluation mode.</p>
+
+ <h2>Measured Parameters</h2>
+ <p>These numbers come from PyTorch 2.8.0 on a CPU build. Each layer was built with default options, so both weight and bias exist.</p>
+ <pre><code>python3 -c "import torch, torch.nn as nn; ..."
+
+nn.LayerNorm([32, 128])   weight (32, 128)   parameters 8192
+nn.BatchNorm2d(64)        parameters 128
+                          running_mean (64,)</code></pre>
+ <p>The counts differ by a factor of 64 for the same nominal "size". LayerNorm holds one weight and one bias for every element of <code>normalized_shape</code>, so 2 &times; 32 &times; 128 = 8,192. BatchNorm2d holds one weight and one bias for every channel, so 2 &times; 64 = 128. BatchNorm also stores <code>running_mean</code> and <code>running_var</code>, one value per channel. Those buffers are not counted as parameters.</p>
+
+ <h2>Train Mode and Eval Mode</h2>
+ <p>BatchNorm behaves differently in the two modes. LayerNorm does not. The test below passes the same input to the same module twice, once in train mode and once in eval mode.</p>
+ <pre><code>bn = nn.BatchNorm2d(64)
+x  = torch.randn(4, 64, 10, 10)
+bn.train(); a = bn(x)
+bn.eval();  b = bn(x)
+# a != b, because eval mode uses the stored running statistics
+
+ln = nn.LayerNorm(100)
+y  = torch.randn(4, 10, 100)
+ln.train(); c = ln(y)
+ln.eval();  d = ln(y)
+# c == d, because LayerNorm has no running statistics</code></pre>
+ <p>Measured result: <code>torch.allclose(a, b)</code> is <code>False</code> for BatchNorm2d. <code>torch.allclose(c, d)</code> is <code>True</code> for LayerNorm. A LayerNorm layer has no state to update between the two modes, so a checkpoint carries no batch statistics for it.</p>
+
+ <h2>Dependence on Batch Size</h2>
+ <p>BatchNorm needs more than one value per channel in train mode. With a batch of one, PyTorch raises an error before any output exists:</p>
+ <pre><code>nn.BatchNorm1d(8).train()(torch.randn(1, 8))
+# ValueError: Expected more than 1 value per channel when training,
+#             got input size torch.Size([1, 8])</code></pre>
+ <p>A LayerNorm layer accepts a batch of one, because its statistic comes from the sample itself. The mean of each normalized output vector is zero. Measured value for the first vector after <code>nn.LayerNorm(100)</code>: 1.4e-08, which is zero within float32 rounding.</p>
+
+ <h2>Which Layer to Use</h2>
+ <ul>
+  <li>Use <code>LayerNorm</code> when each sample must be handled on its own: transformers, sequence models, and any model that runs with batch size 1 at inference.</li>
+  <li>Use <code>BatchNorm2d</code> when the statistics of the batch are stable and the model is a convolutional image network trained with a large batch.</li>
+  <li>Use <code>BatchNorm1d</code> for 2D or 3D inputs, and <code>BatchNorm2d</code> for 4D inputs. The rank check is strict: a 4D tensor passed to <code>BatchNorm1d</code> raises an error.</li>
+ </ul>
+
+ <section class="related-links">
+ <h2>Related Questions</h2>
+ <div class="related-grid">
+ <a href="/tools/layernorm-calculator.html" class="related-card">LayerNorm Shape Calculator</a>
+ <a href="/tools/batchnorm-calculator.html" class="related-card">BatchNorm Shape Calculator</a>
+ <a href="/answers/batch-norm-input-shape.html" class="related-card">What Input Shape Does BatchNorm Expect?</a>
+ <a href="/answers/batchnorm1d-expected-2d-or-3d-input-got-4d.html" class="related-card">BatchNorm1d Expected 2D or 3D Input</a>
+ </div>
+ </section>
+
+ <div style="text-align:center;margin:2rem 0;">
+ <a href="/tools/layernorm-calculator.html" style="display:inline-block;padding:0.75rem 2rem;background:var(--accent);color:#fff;border-radius:var(--radius);text-decoration:none;font-weight:600;">Try the LayerNorm Calculator</a>
+ </div>
+ </article>
+
+<section class="product-cta" aria-labelledby="product-cta-title">
+ <div class="product-cta-copy"><p class="product-cta-kicker">TENSOR PREFLIGHT · DOWNLOADABLE PYTORCH TOOLKIT</p>
+ <h2 id="product-cta-title">Take the next step in your own PyTorch model.</h2>
+ <p>Trace a local forward pass, inspect tensor shapes in an HTML report, and turn a repair into a regression check. Includes eight broken-and-fixed workflows, source code and setup instructions.</p>
+ <details class="product-fit"><summary>Is this toolkit right for my problem?</summary><p><strong>Use the free calculator</strong> for a layer formula or a quick shape check.</p><p><strong>Consider Tensor Preflight</strong> when you have a local PyTorch model and want a forward-pass report plus repeatable checks. Python 3.9+ and PyTorch 2.8+ are required. It does not run your model in this website or automatically repair it.</p><p>Open the sample report before buying to check the output format.</p></details>
+ <p class="product-cta-requirements">Python 3.9+ · PyTorch 2.8+ · Runs locally</p></div>
+ <div class="product-cta-actions"><a class="product-cta-buy" href="https://buy.heytensor.com/?utm_source=heytensor&utm_medium=website&utm_campaign=toolkit-fit&utm_content=answers%2Flayernorm-vs-batchnorm">Get Tensor Preflight — $29 <span aria-hidden="true">→</span></a>
+ <span class="product-cta-payment">One-time payment · ZIP download</span>
+ <a class="product-cta-sample" href="https://buy.heytensor.com/sample-report.html?utm_source=heytensor&utm_medium=website&utm_campaign=toolkit-fit&utm_content=answers%2Flayernorm-vs-batchnorm">See a sample report</a></div>
+</section>
+</main>
+
+ <footer class="site-footer">
+ <div class="footer-inner">
+ <div class="footer-brand">Zovo Tools</div>
+ <div class="footer-tagline">Free developer tools by a solo dev. Optional analytics by consent.</div>
+ <a href="https://zovo.one/pricing?utm_source=heytensor&amp;utm_medium=satellite&amp;utm_campaign=footer-link" class="footer-cta">Zovo Lifetime, $99 once, free forever &rarr;</a>
+ <div class="footer-copy">&copy; 2026 <a href="https://zovo.one/lifetime?utm_source=heytensor&amp;utm_medium=footer&amp;utm_campaign=answers-convtranspose2d-output-size-formula">Zovo</a> &middot; lifetime access, one payment</div>
+ 
+<div class="support-cta support-cta-footer" data-support-cta="footer" aria-label="Support HeyTensor"><p class="sc-title">Made by Michael, one person and a lot of coffee.</p><p class="sct-maker"><img class="sct-face" src="/assets/michael-128.webp" width="44" height="44" loading="lazy" alt="Michael Lip"><span>If HeyTensor has helped you, you can buy me a coffee. It honestly makes my day, and I read every note that comes with one.</span></p><div class="sct-actions"><span class="sct-card-rail"><a class="sc-btn sc-btn-primary" href="https://paypal.me/najzzz/5USD" target="_blank" rel="noopener" data-rail="paypal">Buy me a coffee · $5</a><small>via PayPal</small></span><a class="sc-btn sc-btn-secondary" href="https://buymeacoffee.com/michaellip" target="_blank" rel="noopener" data-rail="bmc">Card, any amount or monthly</a><a class="sc-btn sct-github" href="https://github.com/sponsors/theluckystrike" data-rail="github" target="_blank" rel="noopener">Sponsor on GitHub<small>monthly or one-time</small></a><a class="sc-why" href="/support/">Why I ask</a></div></div>
+</div>
+ </footer>
+
+ <nav class="zovo-network" aria-label="Zovo Tools Network">
+ <div class="zovo-network-inner">
+ <h3 class="zovo-network-title">Explore More Tools</h3>
+ <div class="zovo-network-links">
+ <a href="https://abwex.com">ABWex, A/B Testing</a>
+ <a href="https://b2berp.com">B2BERP, Business Tools</a>
+ <a href="https://bugbountyreality.com">BugBountyReality, Security</a>
+ <a href="https://claudflow.com">ClaudFlow, Workflows</a>
+ <a href="https://claudkit.com">ClaudKit, API Tools</a>
+ <a href="https://dismissticket.com">DismissTicket, Support</a>
+ <a href="https://enhio.com">Enhio, Text Tools</a>
+ <a href="https://epochpilot.com">EpochPilot, Timestamps</a>
+ <a href="https://gen8x.com">Gen8X, Color Tools</a>
+ <a href="https://gpt0x.com">GPT0X, AI Models</a>
+ <a href="https://ingredientcalculator.com">IngredientCalc, Recipes</a>
+ <a href="https://invokebot.com">InvokeBot, Webhooks</a>
+ <a href="https://kappafy.com">Kappafy, JSON</a>
+ <a href="https://kappakit.com">KappaKit, Dev Toolkit</a>
+ <a href="https://kickllm.com">KickLLM, LLM Costs</a>
+ <a href="https://krzen.com">Krzen, Image Tools</a>
+ <a href="https://lochbot.com">LochBot, Security</a>
+ <a href="https://lockml.com">LockML, ML Security</a>
+ <a href="https://ml0x.com?utm_source=heytensor&amp;utm_medium=nav&amp;utm_campaign=answers-convtranspose2d-output-size-formula">ML0X, ML Basics</a>
+ <a href="https://ml3x.com">ML3X, Matrix Math</a>
+ <a href="https://pictureeditor.net">PictureEditor, Image Editing</a>
+ <a href="https://recipetool.net">RecipeTool, Cooking</a>
+ <a href="https://viryd.com">Viryd, Dev Tools</a>
+ </div>
+ </div>
+</nav>
+
+<div class="pow-strip">
+ <div class="pow-strip-inner">
+ <span class="pow-label">By the same builder:</span>
+ <a href="https://github.com/theluckystrike" rel="nofollow">GitHub, theluckystrike</a>
+ <a href="https://www.belikenative.com" rel="nofollow">BeLikeNative, Grammar AI</a>
+ <a href="https://earlythunder.com" rel="nofollow">EarlyThunder, Dev Blog</a>
+ <a href="https://bugbountyreality.com" rel="nofollow">Bug Bounty Reality</a>
+ <a href="https://zovo.one/lifetime?utm_source=heytensor&amp;utm_medium=inline&amp;utm_campaign=answers-convtranspose2d-output-size-formula" rel="nofollow">Zovo, AI Dev Tools</a>
+ </div>
+</div>
+ <script src="/assets/js/share.js"></script>
+<script src="/assets/js/hts-ui.js" defer></script>
+</body>
+</html>

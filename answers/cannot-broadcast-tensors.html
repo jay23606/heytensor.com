@@ -28,7 +28,7 @@
   "@type": "FAQPage",
   "mainEntity": [{
    "@type": "Question",
-   "name": "How to fix cannot broadcast tensors in PyTorch?",
+   "name": "How to Fix \"Cannot Broadcast Tensors\" in PyTorch",
    "acceptedAnswer": {
     "@type": "Answer",
     "text": "Broadcasting requires dimensions to match from the right. Two dimensions are compatible when they are equal, or one of them is 1. Use .unsqueeze() to add dimensions of size 1. For example, (3,4) + (4,) works because 4==4, but (3,4) + (3,) fails because 4!=3. Fix: reshape (3,) to (3,1) with .unsqueeze(-1), then (3,4) + (3,1) broadcasts correctly."
