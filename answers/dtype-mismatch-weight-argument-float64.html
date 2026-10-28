@@ -321,7 +321,12 @@
  <p>TL;DR: your module's weight is <code>float32</code> and the tensor you passed in is <code>float64</code>. PyTorch will not mix them. Cast the data with <code>torch.from_numpy(x).float()</code> or <code>x.astype(np.float32)</code>. If you actually want double precision everywhere, call <code>model.double()</code> and cast the input with <code>x.to(torch.float64)</code> so both sides move together.</p>
  </div>
 
- <div class="error-callout">
+  <div class="quick-answer" style="background:var(--bg-card);border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:var(--radius);padding:1rem 1.25rem;margin:1.5rem 0;">
+   <p style="margin:0 0 0.5rem;line-height:1.7;">PyTorch requires both operands of an operation to share one dtype. Convert the input tensor to float32 with x.float() before the forward pass. If you need double precision, move the model with model.double() and the input with x.double() so both sides match.</p>
+   <p style="margin:0;font-size:0.8rem;color:var(--text-muted);">Updated <time datetime="2026-10-28">October 28, 2026</time></p>
+  </div>
+
+  <div class="error-callout">
  RuntimeError: expected dtype torch.float32 for the weight argument but got dtype torch.float64
  </div>
 

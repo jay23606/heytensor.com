@@ -30,11 +30,12 @@
  {
   "@context": "https://schema.org",
   "@type": "Article",
-  "headline": "Fix 'mat1 and mat2 shapes cannot be multiplied' in PyTorch, Complete Guide",
+  "headline": "Fix \"mat1 and mat2 shapes cannot be multiplied\" in PyTorch",
   "description": "Complete guide to fixing PyTorch RuntimeError: mat1 and mat2 shapes cannot be multiplied. 7 real-world causes with code fixes, interactive shape checker, step-by-step debugging process, and prevention tips.",
   "datePublished": "2026-05-16",
   "dateModified": "2026-05-16",
   "author": {
+   "@id": "https://heytensor.com/#author",
    "@type": "Person",
    "name": "Michael Lip",
    "url": "https://zovo.one"
@@ -54,48 +55,43 @@
  {
   "@context": "https://schema.org",
   "@type": "HowTo",
-  "name": "How to Fix RuntimeError: mat1 and mat2 shapes cannot be multiplied in PyTorch",
+  "name": "Fix \"mat1 and mat2 shapes cannot be multiplied\" in PyTorch",
   "description": "Step-by-step guide to diagnosing and fixing the most common PyTorch RuntimeError. Covers Conv2d-to-Linear transitions, wrong in_features, batch dimension confusion, missing flatten, pooling mismatches, transfer learning errors, and custom architectures.",
   "totalTime": "PT5M",
-  "supply": [{"@type": "HowToSupply", "name": "PyTorch >= 1.0"}],
-  "tool": [{"@type": "HowToTool", "name": "HeyTensor Shape Checker"}, {"@type": "HowToTool", "name": "Python REPL"}],
+  "tool": [{"@type": "HowToTool", "name": "Matrix Multiplication Shape Checker"}],
   "step": [
    {
     "@type": "HowToStep",
     "position": 1,
-    "name": "Read the error dimensions",
+    "name": "Read the Error Dimensions",
     "text": "Parse the error: 'mat1 and mat2 shapes cannot be multiplied (AxB and CxD)'. B is your actual input feature count. C is what nn.Linear expects as in_features. B must equal C."
    },
    {
     "@type": "HowToStep",
     "position": 2,
-    "name": "Add shape diagnostics",
+    "name": "Add Shape Print Statements",
     "text": "Insert print(x.shape) after every layer in your forward() method. This reveals the exact layer where the shape diverges from expectations."
    },
    {
     "@type": "HowToStep",
     "position": 3,
-    "name": "Identify the root cause",
+    "name": "Run a Dummy Forward Pass",
     "text": "Check for: missing flatten after Conv2d, wrong in_features value, changed input image size, missing or wrong pooling, batch dimension confusion, transfer learning classifier mismatch, or reshape/view errors."
    },
    {
     "@type": "HowToStep",
     "position": 4,
-    "name": "Compute the correct in_features",
+    "name": "Fix the Linear Layer",
     "text": "For CNN-to-Linear: in_features = out_channels * H_out * W_out. Run a dummy pass: x = torch.zeros(1,C,H,W); x = features(x); print(x.flatten(1).shape[1]). Or use nn.LazyLinear."
    },
    {
     "@type": "HowToStep",
     "position": 5,
-    "name": "Fix and verify",
+    "name": "Verify With a Full Forward Pass",
     "text": "Update nn.Linear(in_features=correct_value, out_features=num_classes). Run a full forward pass with dummy data to confirm no errors. Remove debug print statements."
    }
   ],
-  "author": {
-   "@type": "Person",
-   "name": "Michael Lip",
-   "url": "https://zovo.one"
-  },
+"author": {"@id": "https://heytensor.com/#author"},
   "datePublished": "2026-05-16"
  }
  </script>
@@ -182,7 +178,7 @@
   "itemListElement": [
    {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://heytensor.com/"},
    {"@type": "ListItem", "position": 2, "name": "Guides", "item": "https://heytensor.com/guides/"},
-   {"@type": "ListItem", "position": 3, "name": "Fix mat1 and mat2 shapes cannot be multiplied"}
+   {"@type": "ListItem", "position": 3, "name": "Fix mat1 and mat2 shapes error"}
   ]
  }
  </script>

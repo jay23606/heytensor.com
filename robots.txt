@@ -1,37 +1,18 @@
 # HeyTensor — explicitly allow all known AI crawlers (GEO Phase 3.2)
 # When competitors block these, our content is in the retrieval pool and theirs isn't.
+# Sprint 2026-10-28: search and user-fetch bots added. Training-bot policy is unchanged (allow).
 
 User-agent: *
 Allow: /
 
+# Training bots. Policy unchanged.
 User-agent: GPTBot
-Allow: /
-
-User-agent: ChatGPT-User
-Allow: /
-
-User-agent: OAI-SearchBot
-Allow: /
-
-User-agent: Google-Extended
-Allow: /
-
-User-agent: PerplexityBot
-Allow: /
-
-User-agent: Perplexity-User
 Allow: /
 
 User-agent: ClaudeBot
 Allow: /
 
-User-agent: Claude-Web
-Allow: /
-
-User-agent: anthropic-ai
-Allow: /
-
-User-agent: Applebot-Extended
+User-agent: Google-Extended
 Allow: /
 
 User-agent: cohere-ai
@@ -44,6 +25,44 @@ User-agent: Meta-ExternalAgent
 Allow: /
 
 User-agent: Amazonbot
+Allow: /
+
+# Search and user-fetch bots. Needed for AI answer surfaces.
+# Groups with similar names come before their shorter match.
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+User-agent: Claude-SearchBot
+Allow: /
+
+User-agent: Claude-User
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: Applebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Googlebot
 Allow: /
 
 Sitemap: https://heytensor.com/sitemap.xml

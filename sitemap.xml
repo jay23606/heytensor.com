@@ -235,4 +235,22 @@
   <url><loc>https://heytensor.com/answers/bert-base-size-on-disk.html</loc><lastmod>2026-09-18</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
   <url><loc>https://heytensor.com/answers/convtranspose2d-output-size-formula.html</loc><lastmod>2026-09-18</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
   <url><loc>https://heytensor.com/answers/dtype-mismatch-weight-argument-float64.html</loc><lastmod>2026-09-18</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url>
+<loc>https://heytensor.com/answers/conv2d-output-size-zero-or-negative.html</loc>
+<lastmod>2026-10-28</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.7</priority>
+</url>
+  <url>
+<loc>https://heytensor.com/answers/layernorm-vs-batchnorm.html</loc>
+<lastmod>2026-10-28</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.7</priority>
+</url>
+  <url>
+<loc>https://heytensor.com/answers/mixed-precision-memory-savings.html</loc>
+<lastmod>2026-10-28</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.7</priority>
+</url>
 </urlset>

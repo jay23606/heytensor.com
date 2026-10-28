@@ -30,14 +30,15 @@
  {
   "@context": "https://schema.org",
   "@type": "WebApplication",
-  "name": "PyTorch Tensor Shape Calculator & Error Debugger",
+  "name": "PyTorch Tensor Shape Calculator",
   "url": "https://heytensor.com",
-  "description": "PyTorch tensor shape calculator with chain mode, error debugger, and architecture presets. Supports Conv2d, Linear, LSTM, MultiheadAttention, and 10+ layer types.",
+  "description": "Calculate output shapes for 14 layer types. Chain layers together, debug shape errors, and explore architecture presets. Works with PyTorch and TensorFlow.",
   "applicationCategory": "DeveloperApplication",
   "operatingSystem": "Any",
   "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
   "browserRequirements": "Requires JavaScript",
   "author": {
+   "@id": "https://heytensor.com/#author",
    "@type": "Person",
    "name": "Michael Lip",
    "url": "https://zovo.one"
@@ -95,11 +96,9 @@
   ]
  }
  </script>
- <script type="application/ld+json">
- {"@context":"https://schema.org","@type":"WebSite","name":"HeyTensor","url":"https://heytensor.com/","sameAs":"https://github.com/theluckystrike/heytensor.com","author":{"@type":"Person","name":"Michael Lip","url":"https://zovo.one"}}
- </script>
+ <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","@id":"https://heytensor.com/#website","name":"HeyTensor","url":"https://heytensor.com/","sameAs":"https://github.com/theluckystrike/heytensor.com","publisher":{"@id":"https://heytensor.com/#org"}}</script>
 
-<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://heytensor.com/#org","name":"HeyTensor","url":"https://heytensor.com/","description":"Free browser-based PyTorch tensor shape calculator and error debugger.","knowsAbout":["PyTorch","tensor shapes","deep learning","Conv2d","neural network debugging","TensorFlow"]},{"@type":"WebPage","url":"https://heytensor.com/","isPartOf":{"@id":"https://heytensor.com/#org"},"isBasedOn":{"@type":"CreativeWork","name":"PyTorch Documentation","url":"https://pytorch.org/docs/stable/nn.html"},"speakable":{"@type":"SpeakableSpecification","cssSelector":[".qas"]}}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://heytensor.com/#org","name":"HeyTensor","url":"https://heytensor.com/","description":"Free browser-based PyTorch tensor shape calculator and error debugger.","knowsAbout":["PyTorch","tensor shapes","deep learning","Conv2d","neural network debugging","TensorFlow"]},{"@type":"WebPage","@id":"https://heytensor.com/#webpage","url":"https://heytensor.com/","isPartOf":{"@id":"https://heytensor.com/#website"},"about":{"@id":"https://heytensor.com/#org"},"isBasedOn":{"@type":"CreativeWork","name":"PyTorch Documentation","url":"https://pytorch.org/docs/stable/nn.html"},"speakable":{"@type":"SpeakableSpecification","cssSelector":["h1",".qas"]}}]}</script>
 <link rel="stylesheet" href="/assets/css/product-cta.css">
 <script defer src="/assets/js/product-navigation.js"></script>
 <script defer src="/assets/js/roi-measurement.js"></script>
@@ -134,6 +133,12 @@
  <h1>PyTorch <span>Tensor Shape</span> Calculator</h1>
  <p>Calculate output shapes for 14 layer types. Chain layers together, debug shape errors, and explore architecture presets. Works with PyTorch and TensorFlow.</p>
  </section>
+
+  <div class="quick-answer" style="background:var(--bg-card);border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:var(--radius);padding:1rem 1.25rem;margin:1.5rem 0;">
+   <p style="margin:0 0 0.5rem;line-height:1.7;">HeyTensor is a free browser tool. Type an input shape, pick one of 14 layer types, and read the output shape, the formula, and the parameter count. Chain mode traces a whole network. Paste a PyTorch RuntimeError to find the failing layer.</p>
+   <p style="margin:0;font-size:0.8rem;color:var(--text-muted);">Updated <time datetime="2026-10-28">October 28, 2026</time></p>
+  </div>
+
 
 <section class="product-cta product-cta-home" aria-labelledby="product-cta-title">
  <div class="product-cta-copy"><p class="product-cta-kicker">TENSOR PREFLIGHT · DOWNLOADABLE PYTORCH TOOLKIT</p>

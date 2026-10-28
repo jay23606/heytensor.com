@@ -92,7 +92,12 @@
  <p style="margin:0;line-height:1.7;">For each spatial dimension, <code>out = (in - 1) * stride - 2*padding + kernel_size + output_padding</code>. Height and width are computed independently with the same formula.</p>
  </div>
 
- <aside class="answer-tool-cta" style="display:flex;gap:0.9rem;align-items:flex-start;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1rem 1.25rem;margin:1.5rem 0;">
+ <div class="quick-answer" style="background:var(--bg-card);border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:var(--radius);padding:1rem 1.25rem;margin:1.5rem 0;">
+   <p style="margin:0 0 0.5rem;line-height:1.7;">Use out = (in - 1) * stride - 2 * padding + kernel_size + output_padding for each spatial dimension. Height and width use the same formula and do not interact. Channels come from the layer, not the formula: out_channels replaces in_channels.</p>
+   <p style="margin:0;font-size:0.8rem;color:var(--text-muted);">Updated <time datetime="2026-10-28">October 28, 2026</time></p>
+  </div>
+
+<aside class="answer-tool-cta" style="display:flex;gap:0.9rem;align-items:flex-start;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1rem 1.25rem;margin:1.5rem 0;">
  <div style="flex:1;min-width:0;">
  <p style="margin:0 0 0.35rem;font-size:0.78rem;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted);">Run it yourself</p>
  <p style="margin:0;line-height:1.6;"><a href="/tools/convtranspose2d-calculator.html"><strong>ConvTranspose2d Output Size Calculator</strong></a>. Enter input, kernel, stride, padding and output_padding to get the exact output shape.</p>

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en" data-sct-site="heytensor.com">
+<head>
+ <meta charset="UTF-8">
+ <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Does Mixed Precision Training Halve GPU Memory? | HeyTensor</title>
+ <meta name="description" content="Mixed precision halves activation bytes, not the whole training footprint. Standard AMP keeps float32 weights, gradients and Adam state. Measured sizes for a 2.1M parameter model.">
+ <meta name="robots" content="index, follow">
+ <link rel="canonical" href="https://heytensor.com/answers/mixed-precision-memory-savings.html">
+ <meta property="og:type" content="article">
+ <meta property="og:title" content="Does mixed precision halve GPU memory?">
+ <meta property="og:description" content="Mixed precision halves activation bytes, not the whole training footprint. Standard AMP keeps float32 weights, gradients and Adam state. Measured sizes for a 2.1M parameter model.">
+ <meta property="og:url" content="https://heytensor.com/answers/mixed-precision-memory-savings.html">
+ <meta property="og:site_name" content="HeyTensor">
+ <meta property="og:image" content="https://heytensor.com/assets/og-image.png">
+ <meta name="twitter:card" content="summary_large_image">
+ <meta name="twitter:title" content="Does mixed precision halve GPU memory?">
+ <meta name="twitter:description" content="Mixed precision halves activation bytes, not the whole training footprint. Standard AMP keeps float32 weights, gradients and Adam state. Measured sizes for a 2.1M parameter model.">
+ <meta name="twitter:image" content="https://heytensor.com/assets/og-image.png">
+ <link rel="preconnect" href="https://fonts.googleapis.com">
+ <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+ <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="/assets/style.css">
+ <script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "Article",
+ "headline": "Does Mixed Precision Training Halve GPU Memory Usage?",
+ "description": "Mixed precision halves activation bytes, not the whole training footprint. Standard AMP keeps float32 weights, gradients and Adam state. Measured sizes for a 2.1M parameter model.",
+ "url": "https://heytensor.com/answers/mixed-precision-memory-savings.html",
+ "mainEntityOfPage": "https://heytensor.com/answers/mixed-precision-memory-savings.html",
+ "datePublished": "2026-10-28",
+ "dateModified": "2026-10-28",
+ "author": {
+  "@type": "Organization",
+  "name": "HeyTensor",
+  "url": "https://heytensor.com/"
+ },
+ "publisher": {
+  "@type": "Organization",
+  "name": "HeyTensor",
+  "url": "https://heytensor.com/"
+ },
+ "image": "https://heytensor.com/assets/og-image.png"
+}
+</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://heytensor.com/"}, {"@type": "ListItem", "position": 2, "name": "Answers", "item": "https://heytensor.com/answers/"}, {"@type": "ListItem", "position": 3, "name": "Does Mixed Precision Training Halve GPU Memory Usage?"}]}</script>
+<link rel="stylesheet" href="/assets/css/product-cta.css">
+<script defer src="/assets/js/product-navigation.js"></script>
+<script defer src="/assets/js/roi-measurement.js"></script>
+<link rel="stylesheet" href="/assets/css/support-cta.css?v=3">
+<link rel="stylesheet" href="/assets/support-v3.css?v=4-github-20261017">
+<script src="/assets/support-v3.js?v=3"></script>
+</head>
+<body>
+ <header>
+ <div class="container header-inner">
+ <a href="/" class="logo">Hey<span>Tensor</span></a>
+ <button class="mobile-toggle" aria-label="Menu">&#9776;</button>
+ <nav>
+ <a class="nav-toolkit" href="https://buy.heytensor.com/">Debug Toolkit <span>· $29</span></a>
+ <a href="/">Calculator</a>
+ <a href="/tools/">Tools</a>
+ <a href="/answers/" class="active">Answers</a>
+ <a href="/research/">Research</a>
+ <a href="/guides/">Guides</a>
+ <a href="/about.html">About</a>
+ <a href="/blog/">Blog</a>
+ <div class="nav-right">
+ <a href="https://zovo.one/pricing?utm_source=heytensor&amp;utm_medium=satellite&amp;utm_campaign=nav-link" class="nav-pro" target="_blank">Go Pro &#10022;</a>
+ <a href="https://zovo.one/tools?utm_source=heytensor&amp;utm_medium=nav&amp;utm_campaign=answers-mixed-precision-memory-savings" class="nav-zovo">Zovo Tools</a>
+ </div>
+ </nav>
+ </div>
+ </header>
+
+ <main class="container" style="max-width:720px;">
+ <nav class="breadcrumb" aria-label="Breadcrumb">
+ <a href="/">Home</a> <span>/</span> <a href="/answers/">Answers</a> <span>/</span> <span>Does Mixed Precision Training Halve GPU Memory Usage?</span>
+ </nav>
+
+ <article>
+ <h1>Does Mixed Precision Training Halve GPU Memory Usage?</h1>
+
+ <h2>The Short Answer</h2>
+ <p>No. Mixed precision halves the bytes of activation tensors and of any weight tensor you convert to float16. In standard automatic mixed precision the master weights, the gradients, and the optimizer state stay float32. So the total of a training step falls by much less than half, and a model with a large Adam state saves almost nothing.</p>
+
+ <h2>Measured Parameter Bytes</h2>
+ <p>PyTorch 2.8.0, CPU build. The model is two <code>nn.Linear(1024, 1024)</code> layers with a ReLU between them: 2,099,200 parameters.</p>
+ <pre><code>model.to(torch.float32)   8,396,800 bytes   (4 bytes each)
+model.to(torch.float16)   4,198,400 bytes   (2 bytes each)</code></pre>
+ <p>The ratio is exactly 2 when the tensors themselves hold float16. An activation tensor of N elements takes 4N bytes in float32 and 2N bytes in float16, so activations also halve.</p>
+
+ <h2>What Standard AMP Keeps in Float32</h2>
+ <p><code>torch.autocast</code> casts inside each operation. It does not convert the stored parameters. The module keeps float32 weights, the backward pass writes float32 gradients, and Adam keeps two float32 state tensors per parameter. For the same model:</p>
+ <pre><code>parameters (float32)           8,396,800 bytes
+gradients (float32)            8,396,800 bytes
+Adam state (2 tensors, fp32)  16,793,600 bytes
+total without activations     33,587,200 bytes</code></pre>
+ <p>All three lines keep the same size with autocast on. The optimizer state alone is twice the size of the float32 parameters, so it dominates the footprint of a training step.</p>
+
+ <h2>Where the Saving Comes From</h2>
+ <table>
+  <tr><th>Block</th><th>Float32</th><th>Standard AMP</th></tr>
+  <tr><td>Master weights</td><td>4 bytes per value</td><td>4 bytes per value</td></tr>
+  <tr><td>Gradients</td><td>4 bytes per value</td><td>4 bytes per value</td></tr>
+  <tr><td>Adam state</td><td>8 bytes per value</td><td>8 bytes per value</td></tr>
+  <tr><td>Activations</td><td>4 bytes per value</td><td>2 bytes per value</td></tr>
+ </table>
+ <p>The one row that halves is the row that dominates small models and long sequences. A model with large activations per parameter saves close to half. A model with a large optimizer state, such as a wide transformer trained with Adam, saves a small fraction.</p>
+
+ <h2>If You Convert the Weights Instead</h2>
+ <p><code>model.half()</code> does store float16 parameters, and the measured size drops to 4,198,400 bytes for this model. That is a different setup from autocast. It needs loss scaling, and the optimizer state usually stays float32. Measure the whole step, not just the weights.</p>
+
+ <h2>Measure Before You Change the Batch Size</h2>
+ <p>Use the <a href="/tools/mixed-precision-estimator.html">mixed precision estimator</a> to compare the two setups for your layer sizes. The largest batch that fits is set by the total, not by the weight bytes.</p>
+
+ <section class="related-links">
+ <h2>Related Questions</h2>
+ <div class="related-grid">
+ <a href="/tools/mixed-precision-estimator.html" class="related-card">Mixed Precision Memory Estimator</a>
+ <a href="/research/pytorch-gpu-memory-guide.html" class="related-card">PyTorch GPU Memory Guide</a>
+ <a href="/tools/llm-gpu-fit-calculator.html" class="related-card">LLM GPU Fit Calculator</a>
+ <a href="/answers/cuda-out-of-memory-fix.html" class="related-card">Fix CUDA Out of Memory</a>
+ </div>
+ </section>
+
+ <div style="text-align:center;margin:2rem 0;">
+ <a href="/tools/mixed-precision-estimator.html" style="display:inline-block;padding:0.75rem 2rem;background:var(--accent);color:#fff;border-radius:var(--radius);text-decoration:none;font-weight:600;">Try the Mixed Precision Estimator</a>
+ </div>
+ </article>
+
+<section class="product-cta" aria-labelledby="product-cta-title">
+ <div class="product-cta-copy"><p class="product-cta-kicker">TENSOR PREFLIGHT · DOWNLOADABLE PYTORCH TOOLKIT</p>
+ <h2 id="product-cta-title">Take the next step in your own PyTorch model.</h2>
+ <p>Trace a local forward pass, inspect tensor shapes in an HTML report, and turn a repair into a regression check. Includes eight broken-and-fixed workflows, source code and setup instructions.</p>
+ <details class="product-fit"><summary>Is this toolkit right for my problem?</summary><p><strong>Use the free calculator</strong> for a layer formula or a quick shape check.</p><p><strong>Consider Tensor Preflight</strong> when you have a local PyTorch model and want a forward-pass report plus repeatable checks. Python 3.9+ and PyTorch 2.8+ are required. It does not run your model in this website or automatically repair it.</p><p>Open the sample report before buying to check the output format.</p></details>
+ <p class="product-cta-requirements">Python 3.9+ · PyTorch 2.8+ · Runs locally</p></div>
+ <div class="product-cta-actions"><a class="product-cta-buy" href="https://buy.heytensor.com/?utm_source=heytensor&utm_medium=website&utm_campaign=toolkit-fit&utm_content=answers%2Fmixed-precision-memory-savings">Get Tensor Preflight — $29 <span aria-hidden="true">→</span></a>
+ <span class="product-cta-payment">One-time payment · ZIP download</span>
+ <a class="product-cta-sample" href="https://buy.heytensor.com/sample-report.html?utm_source=heytensor&utm_medium=website&utm_campaign=toolkit-fit&utm_content=answers%2Fmixed-precision-memory-savings">See a sample report</a></div>
+</section>
+</main>
+
+ <footer class="site-footer">
+ <div class="footer-inner">
+ <div class="footer-brand">Zovo Tools</div>
+ <div class="footer-tagline">Free developer tools by a solo dev. Optional analytics by consent.</div>
+ <a href="https://zovo.one/pricing?utm_source=heytensor&amp;utm_medium=satellite&amp;utm_campaign=footer-link" class="footer-cta">Zovo Lifetime, $99 once, free forever &rarr;</a>
+ <div class="footer-copy">&copy; 2026 <a href="https://zovo.one/lifetime?utm_source=heytensor&amp;utm_medium=footer&amp;utm_campaign=answers-convtranspose2d-output-size-formula">Zovo</a> &middot; lifetime access, one payment</div>
+ 
+<div class="support-cta support-cta-footer" data-support-cta="footer" aria-label="Support HeyTensor"><p class="sc-title">Made by Michael, one person and a lot of coffee.</p><p class="sct-maker"><img class="sct-face" src="/assets/michael-128.webp" width="44" height="44" loading="lazy" alt="Michael Lip"><span>If HeyTensor has helped you, you can buy me a coffee. It honestly makes my day, and I read every note that comes with one.</span></p><div class="sct-actions"><span class="sct-card-rail"><a class="sc-btn sc-btn-primary" href="https://paypal.me/najzzz/5USD" target="_blank" rel="noopener" data-rail="paypal">Buy me a coffee · $5</a><small>via PayPal</small></span><a class="sc-btn sc-btn-secondary" href="https://buymeacoffee.com/michaellip" target="_blank" rel="noopener" data-rail="bmc">Card, any amount or monthly</a><a class="sc-btn sct-github" href="https://github.com/sponsors/theluckystrike" data-rail="github" target="_blank" rel="noopener">Sponsor on GitHub<small>monthly or one-time</small></a><a class="sc-why" href="/support/">Why I ask</a></div></div>
+</div>
+ </footer>
+
+ <nav class="zovo-network" aria-label="Zovo Tools Network">
+ <div class="zovo-network-inner">
+ <h3 class="zovo-network-title">Explore More Tools</h3>
+ <div class="zovo-network-links">
+ <a href="https://abwex.com">ABWex, A/B Testing</a>
+ <a href="https://b2berp.com">B2BERP, Business Tools</a>
+ <a href="https://bugbountyreality.com">BugBountyReality, Security</a>
+ <a href="https://claudflow.com">ClaudFlow, Workflows</a>
+ <a href="https://claudkit.com">ClaudKit, API Tools</a>
+ <a href="https://dismissticket.com">DismissTicket, Support</a>
+ <a href="https://enhio.com">Enhio, Text Tools</a>
+ <a href="https://epochpilot.com">EpochPilot, Timestamps</a>
+ <a href="https://gen8x.com">Gen8X, Color Tools</a>
+ <a href="https://gpt0x.com">GPT0X, AI Models</a>
+ <a href="https://ingredientcalculator.com">IngredientCalc, Recipes</a>
+ <a href="https://invokebot.com">InvokeBot, Webhooks</a>
+ <a href="https://kappafy.com">Kappafy, JSON</a>
+ <a href="https://kappakit.com">KappaKit, Dev Toolkit</a>
+ <a href="https://kickllm.com">KickLLM, LLM Costs</a>
+ <a href="https://krzen.com">Krzen, Image Tools</a>
+ <a href="https://lochbot.com">LochBot, Security</a>
+ <a href="https://lockml.com">LockML, ML Security</a>
+ <a href="https://ml0x.com?utm_source=heytensor&amp;utm_medium=nav&amp;utm_campaign=answers-convtranspose2d-output-size-formula">ML0X, ML Basics</a>
+ <a href="https://ml3x.com">ML3X, Matrix Math</a>
+ <a href="https://pictureeditor.net">PictureEditor, Image Editing</a>
+ <a href="https://recipetool.net">RecipeTool, Cooking</a>
+ <a href="https://viryd.com">Viryd, Dev Tools</a>
+ </div>
+ </div>
+</nav>
+
+<div class="pow-strip">
+ <div class="pow-strip-inner">
+ <span class="pow-label">By the same builder:</span>
+ <a href="https://github.com/theluckystrike" rel="nofollow">GitHub, theluckystrike</a>
+ <a href="https://www.belikenative.com" rel="nofollow">BeLikeNative, Grammar AI</a>
+ <a href="https://earlythunder.com" rel="nofollow">EarlyThunder, Dev Blog</a>
+ <a href="https://bugbountyreality.com" rel="nofollow">Bug Bounty Reality</a>
+ <a href="https://zovo.one/lifetime?utm_source=heytensor&amp;utm_medium=inline&amp;utm_campaign=answers-convtranspose2d-output-size-formula" rel="nofollow">Zovo, AI Dev Tools</a>
+ </div>
+</div>
+ <script src="/assets/js/share.js"></script>
+<script src="/assets/js/hts-ui.js" defer></script>
+</body>
+</html>
